@@ -1,0 +1,51 @@
+<div>
+    <x-slot name="header">
+        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
+            {{ __('Super Admin Dashboard - System Overview') }}
+        </h2>
+    </x-slot>
+
+    <div class="py-12">
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+            <!-- Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                <!-- Card 1 -->
+                <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+                    <div class="p-6 text-gray-900 dark:text-gray-100">
+                        <div class="text-sm text-gray-500">System Status</div>
+                        <div class="text-2xl font-bold text-green-500">Operational</div>
+                        <div class="text-xs text-gray-400 mt-2">Last check: {{ now()->format('H:i A') }}</div>
+                    </div>
+                </div>
+
+                <!-- Card 2 -->
+                <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+                    <div class="p-6 text-gray-900 dark:text-gray-100">
+                        <div class="text-sm text-gray-500">Laravel Version</div>
+                        <div class="text-2xl font-bold">{{ app()->version() }}</div>
+                        <div class="text-xs text-gray-400 mt-2">PHP {{ phpversion() }}</div>
+                    </div>
+                </div>
+
+                <!-- Card 3 -->
+                <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+                    <div class="p-6 text-gray-900 dark:text-gray-100">
+                        <div class="text-sm text-gray-500">Database</div>
+                        <div class="text-2xl font-bold">Connected</div>
+                        <div class="text-xs text-gray-400 mt-2">{{ config('database.default') }}</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Maintenance Actions -->
+            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg p-6">
+                <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">Maintenance Actions</h3>
+                <div class="flex space-x-4">
+                    <button class="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 transition">Clear Cache</button>
+                    <button class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition">Enable Maintenance Mode</button>
+                    <button class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition">Update System</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
