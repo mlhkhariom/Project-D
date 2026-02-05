@@ -33,6 +33,9 @@ new class extends Component
                     <x-nav-link :href="route('superadmin.dashboard')" :active="request()->routeIs('superadmin.dashboard')" wire:navigate class="text-white">
                         {{ __('Dashboard') }}
                     </x-nav-link>
+                    <x-nav-link :href="route('superadmin.themes')" :active="request()->routeIs('superadmin.themes')" wire:navigate class="text-white">
+                        {{ __('Themes') }}
+                    </x-nav-link>
                 </div>
             </div>
 

@@ -2,7 +2,9 @@
 
 use Illuminate\Support\Facades\Route;
 
-Route::view('/', 'welcome');
+Route::get('/', \App\Livewire\Public\Home::class)->name('home');
+Route::get('/shop', \App\Livewire\Public\Shop::class)->name('shop');
+Route::get('/cart', \App\Livewire\Public\Cart::class)->name('cart');
 
 // Customer Dashboard
 Route::view('dashboard', 'dashboard')
@@ -19,6 +21,7 @@ Route::middleware(['auth', 'verified', 'role:super_admin'])
     ->name('superadmin.')
     ->group(function () {
         Route::get('/dashboard', \App\Livewire\SuperAdmin\Dashboard::class)->name('dashboard');
+        Route::get('/themes', \App\Livewire\SuperAdmin\Themes::class)->name('themes');
     });
 
 // Admin Routes (Client)
