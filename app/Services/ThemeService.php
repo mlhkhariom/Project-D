@@ -2,11 +2,14 @@
 
 namespace App\Services;
 
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 class ThemeService
 {
+    protected ?string $activeThemeId = null;
+
     protected array $themes = [
         'theme_1' => [
             'name' => 'Default (Clean)',
@@ -57,7 +60,7 @@ class ThemeService
 
         $i = 3;
         foreach ($palettes as $name => $colors) {
-             $this->themes["theme_{$i}"] = [
+            $this->themes["theme_{$i}"] = [
                 'name' => "$name Light",
                 'colors' => [
                     'primary' => $colors[0],
@@ -92,17 +95,26 @@ class ThemeService
 
     public function getActiveThemeId(): string
     {
-        // Avoid database calls during migrations or if table doesn't exist
-        if (!Schema::hasTable('settings')) {
-            return 'theme_1';
+        if ($this->activeThemeId) {
+            return $this->activeThemeId;
         }
 
-        return DB::table('settings')->where('key', 'active_theme')->value('value') ?? 'theme_1';
+        $this->activeThemeId = Cache::rememberForever('active_theme', function () {
+            // Avoid database calls during migrations or if table doesn't exist
+            if (! Schema::hasTable('settings')) {
+                return 'theme_1';
+            }
+
+            return DB::table('settings')->where('key', 'active_theme')->value('value') ?? 'theme_1';
+        });
+
+        return $this->activeThemeId;
     }
 
     public function getActiveThemeConfig(): array
     {
         $id = $this->getActiveThemeId();
+
         return $this->themes[$id] ?? $this->themes['theme_1'];
     }
 
@@ -113,6 +125,9 @@ class ThemeService
                 ['key' => 'active_theme'],
                 ['value' => $themeId]
             );
+
+            Cache::forget('active_theme');
+            $this->activeThemeId = $themeId;
         }
     }
 }
