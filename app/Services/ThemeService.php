@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
@@ -33,6 +34,11 @@ class ThemeService
         // I will generate 18 more procedural variants
     ];
 
+    /**
+     * Memoized active theme ID to prevent redundant cache/DB lookups in the same request.
+     */
+    protected ?string $activeThemeId = null;
+
     public function __construct()
     {
         // Generate the rest of the 20 themes procedurally
@@ -57,7 +63,7 @@ class ThemeService
 
         $i = 3;
         foreach ($palettes as $name => $colors) {
-             $this->themes["theme_{$i}"] = [
+            $this->themes["theme_{$i}"] = [
                 'name' => "$name Light",
                 'colors' => [
                     'primary' => $colors[0],
@@ -92,17 +98,28 @@ class ThemeService
 
     public function getActiveThemeId(): string
     {
-        // Avoid database calls during migrations or if table doesn't exist
-        if (!Schema::hasTable('settings')) {
-            return 'theme_1';
+        // Memoization: Return if already fetched in this request
+        if ($this->activeThemeId) {
+            return $this->activeThemeId;
         }
 
-        return DB::table('settings')->where('key', 'active_theme')->value('value') ?? 'theme_1';
+        // Cache: Fetch from cache or DB if not cached
+        $this->activeThemeId = Cache::rememberForever('active_theme_id', function () {
+            // Avoid database calls during migrations or if table doesn't exist
+            if (! Schema::hasTable('settings')) {
+                return 'theme_1';
+            }
+
+            return DB::table('settings')->where('key', 'active_theme')->value('value') ?? 'theme_1';
+        });
+
+        return $this->activeThemeId;
     }
 
     public function getActiveThemeConfig(): array
     {
         $id = $this->getActiveThemeId();
+
         return $this->themes[$id] ?? $this->themes['theme_1'];
     }
 
@@ -113,6 +130,10 @@ class ThemeService
                 ['key' => 'active_theme'],
                 ['value' => $themeId]
             );
+
+            // Invalidate cache and update local property
+            Cache::forget('active_theme_id');
+            $this->activeThemeId = $themeId;
         }
     }
 }
