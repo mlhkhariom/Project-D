@@ -4,9 +4,12 @@ namespace App\Services;
 
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Cache;
 
 class ThemeService
 {
+    protected ?string $activeThemeId = null;
+
     protected array $themes = [
         'theme_1' => [
             'name' => 'Default (Clean)',
@@ -92,12 +95,24 @@ class ThemeService
 
     public function getActiveThemeId(): string
     {
+        if ($this->activeThemeId) {
+            return $this->activeThemeId;
+        }
+
+        if (Cache::has('active_theme_id')) {
+            return $this->activeThemeId = Cache::get('active_theme_id');
+        }
+
         // Avoid database calls during migrations or if table doesn't exist
         if (!Schema::hasTable('settings')) {
             return 'theme_1';
         }
 
-        return DB::table('settings')->where('key', 'active_theme')->value('value') ?? 'theme_1';
+        $themeId = DB::table('settings')->where('key', 'active_theme')->value('value') ?? 'theme_1';
+
+        Cache::forever('active_theme_id', $themeId);
+
+        return $this->activeThemeId = $themeId;
     }
 
     public function getActiveThemeConfig(): array
@@ -113,6 +128,9 @@ class ThemeService
                 ['key' => 'active_theme'],
                 ['value' => $themeId]
             );
+
+            Cache::forget('active_theme_id');
+            $this->activeThemeId = $themeId;
         }
     }
 }
