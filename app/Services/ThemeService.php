@@ -7,6 +7,8 @@ use Illuminate\Support\Facades\Schema;
 
 class ThemeService
 {
+    protected ?string $activeThemeId = null;
+
     protected array $themes = [
         'theme_1' => [
             'name' => 'Default (Clean)',
@@ -92,12 +94,16 @@ class ThemeService
 
     public function getActiveThemeId(): string
     {
-        // Avoid database calls during migrations or if table doesn't exist
-        if (!Schema::hasTable('settings')) {
-            return 'theme_1';
+        if ($this->activeThemeId !== null) {
+            return $this->activeThemeId;
         }
 
-        return DB::table('settings')->where('key', 'active_theme')->value('value') ?? 'theme_1';
+        // Avoid database calls during migrations or if table doesn't exist
+        if (!Schema::hasTable('settings')) {
+            return $this->activeThemeId = 'theme_1';
+        }
+
+        return $this->activeThemeId = DB::table('settings')->where('key', 'active_theme')->value('value') ?? 'theme_1';
     }
 
     public function getActiveThemeConfig(): array
@@ -113,6 +119,7 @@ class ThemeService
                 ['key' => 'active_theme'],
                 ['value' => $themeId]
             );
+            $this->activeThemeId = $themeId;
         }
     }
 }
