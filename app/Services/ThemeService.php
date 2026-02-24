@@ -39,6 +39,9 @@ class ThemeService
         $this->generateProceduralThemes();
     }
 
+    protected ?string $cachedActiveThemeId = null;
+    protected ?bool $hasSettingsTable = null;
+
     protected function generateProceduralThemes()
     {
         $palettes = [
@@ -92,12 +95,22 @@ class ThemeService
 
     public function getActiveThemeId(): string
     {
-        // Avoid database calls during migrations or if table doesn't exist
-        if (!Schema::hasTable('settings')) {
-            return 'theme_1';
+        if ($this->cachedActiveThemeId !== null) {
+            return $this->cachedActiveThemeId;
         }
 
-        return DB::table('settings')->where('key', 'active_theme')->value('value') ?? 'theme_1';
+        // Avoid database calls during migrations or if table doesn't exist
+        if ($this->hasSettingsTable === null) {
+            $this->hasSettingsTable = Schema::hasTable('settings');
+        }
+
+        if (!$this->hasSettingsTable) {
+            return $this->cachedActiveThemeId = 'theme_1';
+        }
+
+        $themeId = DB::table('settings')->where('key', 'active_theme')->value('value');
+
+        return $this->cachedActiveThemeId = $themeId ?? 'theme_1';
     }
 
     public function getActiveThemeConfig(): array
@@ -113,6 +126,7 @@ class ThemeService
                 ['key' => 'active_theme'],
                 ['value' => $themeId]
             );
+            $this->cachedActiveThemeId = $themeId;
         }
     }
 }
