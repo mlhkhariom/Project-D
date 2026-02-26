@@ -33,6 +33,16 @@ class ThemeService
         // I will generate 18 more procedural variants
     ];
 
+    /**
+     * Memoized active theme ID to prevent redundant DB queries.
+     */
+    protected ?string $cachedActiveThemeId = null;
+
+    /**
+     * Memoized check for settings table existence.
+     */
+    protected ?bool $hasSettingsTable = null;
+
     public function __construct()
     {
         // Generate the rest of the 20 themes procedurally
@@ -92,12 +102,25 @@ class ThemeService
 
     public function getActiveThemeId(): string
     {
+        // Return memoized value if available
+        if ($this->cachedActiveThemeId !== null) {
+            return $this->cachedActiveThemeId;
+        }
+
+        // Memoize table check
+        if ($this->hasSettingsTable === null) {
+            $this->hasSettingsTable = Schema::hasTable('settings');
+        }
+
         // Avoid database calls during migrations or if table doesn't exist
-        if (!Schema::hasTable('settings')) {
+        if (!$this->hasSettingsTable) {
             return 'theme_1';
         }
 
-        return DB::table('settings')->where('key', 'active_theme')->value('value') ?? 'theme_1';
+        // Query and memoize
+        $this->cachedActiveThemeId = DB::table('settings')->where('key', 'active_theme')->value('value') ?? 'theme_1';
+
+        return $this->cachedActiveThemeId;
     }
 
     public function getActiveThemeConfig(): array
@@ -113,6 +136,9 @@ class ThemeService
                 ['key' => 'active_theme'],
                 ['value' => $themeId]
             );
+
+            // Update local cache to reflect change immediately
+            $this->cachedActiveThemeId = $themeId;
         }
     }
 }
