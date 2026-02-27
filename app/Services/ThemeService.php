@@ -4,6 +4,7 @@ namespace App\Services;
 
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Cache;
 
 class ThemeService
 {
@@ -107,18 +108,22 @@ class ThemeService
             return $this->cachedActiveThemeId;
         }
 
-        // Memoize table check
-        if ($this->hasSettingsTable === null) {
-            $this->hasSettingsTable = Schema::hasTable('settings');
-        }
+        // Check persistent cache first
+        // We use 'rememberForever' so we never hit the DB unless the cache is explicitly cleared
+        $this->cachedActiveThemeId = Cache::rememberForever('active_theme_id', function () {
+            // Memoize table check (only relevant if cache is missed)
+            if ($this->hasSettingsTable === null) {
+                $this->hasSettingsTable = Schema::hasTable('settings');
+            }
 
-        // Avoid database calls during migrations or if table doesn't exist
-        if (!$this->hasSettingsTable) {
-            return 'theme_1';
-        }
+            // Avoid database calls during migrations or if table doesn't exist
+            if (!$this->hasSettingsTable) {
+                return 'theme_1';
+            }
 
-        // Query and memoize
-        $this->cachedActiveThemeId = DB::table('settings')->where('key', 'active_theme')->value('value') ?? 'theme_1';
+            // Query DB
+            return DB::table('settings')->where('key', 'active_theme')->value('value') ?? 'theme_1';
+        });
 
         return $this->cachedActiveThemeId;
     }
@@ -136,6 +141,10 @@ class ThemeService
                 ['key' => 'active_theme'],
                 ['value' => $themeId]
             );
+
+            // Invalidate persistent cache
+            Cache::forget('active_theme_id');
+            // Or update it directly: Cache::forever('active_theme_id', $themeId);
 
             // Update local cache to reflect change immediately
             $this->cachedActiveThemeId = $themeId;
