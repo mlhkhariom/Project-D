@@ -4,6 +4,7 @@ namespace App\Services;
 
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Cache;
 
 class ThemeService
 {
@@ -107,18 +108,20 @@ class ThemeService
             return $this->cachedActiveThemeId;
         }
 
-        // Memoize table check
-        if ($this->hasSettingsTable === null) {
-            $this->hasSettingsTable = Schema::hasTable('settings');
-        }
+        $this->cachedActiveThemeId = Cache::rememberForever('active_theme_id', function () {
+            // Memoize table check
+            if ($this->hasSettingsTable === null) {
+                $this->hasSettingsTable = Schema::hasTable('settings');
+            }
 
-        // Avoid database calls during migrations or if table doesn't exist
-        if (!$this->hasSettingsTable) {
-            return 'theme_1';
-        }
+            // Avoid database calls during migrations or if table doesn't exist
+            if (!$this->hasSettingsTable) {
+                return 'theme_1';
+            }
 
-        // Query and memoize
-        $this->cachedActiveThemeId = DB::table('settings')->where('key', 'active_theme')->value('value') ?? 'theme_1';
+            // Query and memoize
+            return DB::table('settings')->where('key', 'active_theme')->value('value') ?? 'theme_1';
+        });
 
         return $this->cachedActiveThemeId;
     }
@@ -139,6 +142,9 @@ class ThemeService
 
             // Update local cache to reflect change immediately
             $this->cachedActiveThemeId = $themeId;
+
+            // Invalidate persistent cache
+            Cache::forget('active_theme_id');
         }
     }
 }
