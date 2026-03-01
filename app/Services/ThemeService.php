@@ -117,8 +117,10 @@ class ThemeService
             return 'theme_1';
         }
 
-        // Query and memoize
-        $this->cachedActiveThemeId = DB::table('settings')->where('key', 'active_theme')->value('value') ?? 'theme_1';
+        $this->cachedActiveThemeId = \Illuminate\Support\Facades\Cache::rememberForever('active_theme_id', function () {
+            // Query and memoize
+            return DB::table('settings')->where('key', 'active_theme')->value('value') ?? 'theme_1';
+        });
 
         return $this->cachedActiveThemeId;
     }
@@ -139,6 +141,7 @@ class ThemeService
 
             // Update local cache to reflect change immediately
             $this->cachedActiveThemeId = $themeId;
+            \Illuminate\Support\Facades\Cache::forget('active_theme_id');
         }
     }
 }

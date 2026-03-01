@@ -30,4 +30,33 @@ class ThemePerformanceTest extends TestCase
         // If not memoized, this will be much higher due to View::composer('*')
         $this->assertLessThanOrEqual(2, $count, "Too many database queries on homepage. Expected <= 2, got {$count}. Likely missing memoization in ThemeService.");
     }
+
+    public function test_homepage_theme_query_performance_with_warm_cache()
+    {
+        // Theme is already seeded by migration
+
+        // Prime the cache
+        $this->get('/');
+
+        // Enable query logging
+        DB::enableQueryLog();
+
+        // Visit homepage again
+        $response = $this->get('/');
+
+        $response->assertStatus(200);
+
+        // Get query count
+        $queries = DB::getQueryLog();
+
+        // Filter out any queries that aren't related to settings or sqlite_master
+        $filteredQueries = array_filter($queries, function($query) {
+             return str_contains($query['query'], 'settings') || str_contains($query['query'], 'sqlite_master');
+        });
+
+        $count = count($filteredQueries);
+
+        // Assert query count is 0 because of cache (and in-memory Schema check memoization)
+        $this->assertEquals(0, $count, "Too many theme-related database queries on homepage. Expected 0 with warm cache, got {$count}. Cache not working.");
+    }
 }
