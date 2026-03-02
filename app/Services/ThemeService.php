@@ -107,6 +107,13 @@ class ThemeService
             return $this->cachedActiveThemeId;
         }
 
+        // Check application cache to completely bypass DB/Schema checks on warm cache
+        $cachedId = \Illuminate\Support\Facades\Cache::get('active_theme_id');
+        if ($cachedId !== null) {
+            $this->cachedActiveThemeId = $cachedId;
+            return $this->cachedActiveThemeId;
+        }
+
         // Memoize table check
         if ($this->hasSettingsTable === null) {
             $this->hasSettingsTable = Schema::hasTable('settings');
@@ -117,8 +124,10 @@ class ThemeService
             return 'theme_1';
         }
 
-        // Query and memoize
-        $this->cachedActiveThemeId = DB::table('settings')->where('key', 'active_theme')->value('value') ?? 'theme_1';
+        // Query, cache forever, and memoize
+        $this->cachedActiveThemeId = \Illuminate\Support\Facades\Cache::rememberForever('active_theme_id', function () {
+            return DB::table('settings')->where('key', 'active_theme')->value('value') ?? 'theme_1';
+        });
 
         return $this->cachedActiveThemeId;
     }
@@ -136,6 +145,9 @@ class ThemeService
                 ['key' => 'active_theme'],
                 ['value' => $themeId]
             );
+
+            // Invalidate the cache
+            \Illuminate\Support\Facades\Cache::forget('active_theme_id');
 
             // Update local cache to reflect change immediately
             $this->cachedActiveThemeId = $themeId;

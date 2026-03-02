@@ -29,5 +29,14 @@ class ThemePerformanceTest extends TestCase
         // Assert query count is optimized (should be <= 2: 1 schema check + 1 fetch)
         // If not memoized, this will be much higher due to View::composer('*')
         $this->assertLessThanOrEqual(2, $count, "Too many database queries on homepage. Expected <= 2, got {$count}. Likely missing memoization in ThemeService.");
+
+        // Assert cache hit on second visit
+        DB::flushQueryLog();
+        $this->get('/');
+        $queries = DB::getQueryLog();
+        $relevantQueries = array_filter($queries, function ($query) {
+            return str_contains($query['query'], 'settings') || str_contains($query['query'], 'sqlite_master');
+        });
+        $this->assertEquals(0, count($relevantQueries), "Expected 0 queries for settings on warm cache.");
     }
 }
