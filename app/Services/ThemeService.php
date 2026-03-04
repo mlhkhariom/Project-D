@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
@@ -107,6 +108,13 @@ class ThemeService
             return $this->cachedActiveThemeId;
         }
 
+        // Check Laravel Cache before hitting DB or Schema
+        $cachedId = Cache::get('active_theme_id');
+        if ($cachedId !== null) {
+            $this->cachedActiveThemeId = $cachedId;
+            return $this->cachedActiveThemeId;
+        }
+
         // Memoize table check
         if ($this->hasSettingsTable === null) {
             $this->hasSettingsTable = Schema::hasTable('settings');
@@ -119,6 +127,9 @@ class ThemeService
 
         // Query and memoize
         $this->cachedActiveThemeId = DB::table('settings')->where('key', 'active_theme')->value('value') ?? 'theme_1';
+
+        // Cache the result forever (invalidated in setActiveTheme)
+        Cache::forever('active_theme_id', $this->cachedActiveThemeId);
 
         return $this->cachedActiveThemeId;
     }
@@ -136,6 +147,9 @@ class ThemeService
                 ['key' => 'active_theme'],
                 ['value' => $themeId]
             );
+
+            // Invalidate the cache
+            Cache::forget('active_theme_id');
 
             // Update local cache to reflect change immediately
             $this->cachedActiveThemeId = $themeId;
