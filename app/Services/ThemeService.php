@@ -44,10 +44,28 @@ class ThemeService
      */
     protected ?bool $hasSettingsTable = null;
 
+    /**
+     * Flag to track if procedural themes have been generated.
+     */
+    protected bool $proceduralThemesGenerated = false;
+
     public function __construct()
     {
-        // Generate the rest of the 20 themes procedurally
+        // Procedural themes are now lazy-loaded to save CPU cycles
+        // on requests that only need the default static themes.
+    }
+
+    /**
+     * Lazy-load procedural themes only when requested.
+     */
+    protected function ensureProceduralThemesGenerated(): void
+    {
+        if ($this->proceduralThemesGenerated) {
+            return;
+        }
+
         $this->generateProceduralThemes();
+        $this->proceduralThemesGenerated = true;
     }
 
     protected function generateProceduralThemes()
@@ -98,6 +116,8 @@ class ThemeService
 
     public function getAllThemes(): array
     {
+        $this->ensureProceduralThemesGenerated();
+
         return $this->themes;
     }
 
@@ -137,6 +157,12 @@ class ThemeService
     public function getActiveThemeConfig(): array
     {
         $id = $this->getActiveThemeId();
+
+        // Lazy-load procedural themes if the active theme is one of them
+        if (!isset($this->themes[$id])) {
+            $this->ensureProceduralThemesGenerated();
+        }
+
         return $this->themes[$id] ?? $this->themes['theme_1'];
     }
 
