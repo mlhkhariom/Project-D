@@ -44,14 +44,22 @@ class ThemeService
      */
     protected ?bool $hasSettingsTable = null;
 
+    /**
+     * Memoize check to see if procedural themes have been generated.
+     */
+    protected bool $proceduralThemesGenerated = false;
+
     public function __construct()
     {
-        // Generate the rest of the 20 themes procedurally
-        $this->generateProceduralThemes();
+        // Defer generation to avoid performance degradation as per memory
     }
 
-    protected function generateProceduralThemes()
+    protected function generateProceduralThemesIfNeeded()
     {
+        if ($this->proceduralThemesGenerated) {
+            return;
+        }
+
         $palettes = [
             'Nature' => ['#16a34a', '#dcfce7', '#f0fdf4', '#14532d'],
             'Ocean' => ['#0ea5e9', '#e0f2fe', '#f0f9ff', '#0c4a6e'],
@@ -76,7 +84,7 @@ class ThemeService
                     'bg' => '#ffffff',
                     'text' => '#111827',
                 ],
-                'font' => $fonts[array_rand($fonts)],
+                'font' => $fonts[array_rand($fonts)], // Keeping original random behavior
                 'layout' => 'boxed',
             ];
             $i++;
@@ -89,15 +97,18 @@ class ThemeService
                     'bg' => $colors[3], // Dark bg
                     'text' => '#f9fafb',
                 ],
-                'font' => $fonts[array_rand($fonts)],
+                'font' => $fonts[array_rand($fonts)], // Keeping original random behavior
                 'layout' => 'wide',
             ];
             $i++;
         }
+
+        $this->proceduralThemesGenerated = true;
     }
 
     public function getAllThemes(): array
     {
+        $this->generateProceduralThemesIfNeeded();
         return $this->themes;
     }
 
@@ -137,11 +148,22 @@ class ThemeService
     public function getActiveThemeConfig(): array
     {
         $id = $this->getActiveThemeId();
+
+        // If it's a procedural theme, ensure they are generated
+        if (!isset($this->themes[$id]) && str_starts_with($id, 'theme_')) {
+            $this->generateProceduralThemesIfNeeded();
+        }
+
         return $this->themes[$id] ?? $this->themes['theme_1'];
     }
 
     public function setActiveTheme(string $themeId): void
     {
+        // Ensure themes are generated if checking against a non-static theme
+        if (!isset($this->themes[$themeId]) && str_starts_with($themeId, 'theme_')) {
+            $this->generateProceduralThemesIfNeeded();
+        }
+
         if (isset($this->themes[$themeId])) {
             DB::table('settings')->updateOrInsert(
                 ['key' => 'active_theme'],
