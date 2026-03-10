@@ -44,14 +44,23 @@ class ThemeService
      */
     protected ?bool $hasSettingsTable = null;
 
+    /**
+     * Flag to check if procedural themes are generated
+     */
+    protected bool $proceduralThemesGenerated = false;
+
     public function __construct()
     {
-        // Generate the rest of the 20 themes procedurally
-        $this->generateProceduralThemes();
+        // Removed eager generation to prevent unnecessary overhead on every request.
+        // Will be lazily loaded when needed.
     }
 
     protected function generateProceduralThemes()
     {
+        if ($this->proceduralThemesGenerated) {
+            return;
+        }
+
         $palettes = [
             'Nature' => ['#16a34a', '#dcfce7', '#f0fdf4', '#14532d'],
             'Ocean' => ['#0ea5e9', '#e0f2fe', '#f0f9ff', '#0c4a6e'],
@@ -94,10 +103,13 @@ class ThemeService
             ];
             $i++;
         }
+
+        $this->proceduralThemesGenerated = true;
     }
 
     public function getAllThemes(): array
     {
+        $this->generateProceduralThemes();
         return $this->themes;
     }
 
@@ -137,6 +149,11 @@ class ThemeService
     public function getActiveThemeConfig(): array
     {
         $id = $this->getActiveThemeId();
+
+        if (!isset($this->themes[$id])) {
+            $this->generateProceduralThemes();
+        }
+
         return $this->themes[$id] ?? $this->themes['theme_1'];
     }
 
