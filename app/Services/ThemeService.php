@@ -44,14 +44,24 @@ class ThemeService
      */
     protected ?bool $hasSettingsTable = null;
 
+    protected bool $themesGenerated = false;
+
     public function __construct()
     {
-        // Generate the rest of the 20 themes procedurally
-        $this->generateProceduralThemes();
+        // Procedural themes are now lazy-loaded to prevent overhead on every request
+    }
+
+    protected function ensureThemesGenerated(): void
+    {
+        if (!$this->themesGenerated) {
+            $this->generateProceduralThemes();
+        }
     }
 
     protected function generateProceduralThemes()
     {
+        $this->themesGenerated = true;
+
         $palettes = [
             'Nature' => ['#16a34a', '#dcfce7', '#f0fdf4', '#14532d'],
             'Ocean' => ['#0ea5e9', '#e0f2fe', '#f0f9ff', '#0c4a6e'],
@@ -98,6 +108,7 @@ class ThemeService
 
     public function getAllThemes(): array
     {
+        $this->ensureThemesGenerated();
         return $this->themes;
     }
 
@@ -137,11 +148,21 @@ class ThemeService
     public function getActiveThemeConfig(): array
     {
         $id = $this->getActiveThemeId();
+
+        // Lazy load procedural themes if the active theme is not one of the default themes
+        if (!isset($this->themes[$id])) {
+            $this->ensureThemesGenerated();
+        }
+
         return $this->themes[$id] ?? $this->themes['theme_1'];
     }
 
     public function setActiveTheme(string $themeId): void
     {
+        if (!isset($this->themes[$themeId])) {
+            $this->ensureThemesGenerated();
+        }
+
         if (isset($this->themes[$themeId])) {
             DB::table('settings')->updateOrInsert(
                 ['key' => 'active_theme'],
