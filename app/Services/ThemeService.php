@@ -35,6 +35,11 @@ class ThemeService
     ];
 
     /**
+     * Flag to track if procedural themes have been generated.
+     */
+    protected bool $themesGenerated = false;
+
+    /**
      * Memoized active theme ID to prevent redundant DB queries.
      */
     protected ?string $cachedActiveThemeId = null;
@@ -46,8 +51,15 @@ class ThemeService
 
     public function __construct()
     {
-        // Generate the rest of the 20 themes procedurally
-        $this->generateProceduralThemes();
+        // Generation of procedural themes is now lazy-loaded
+    }
+
+    protected function ensureThemesGenerated(): void
+    {
+        if (!$this->themesGenerated) {
+            $this->generateProceduralThemes();
+            $this->themesGenerated = true;
+        }
     }
 
     protected function generateProceduralThemes()
@@ -98,6 +110,8 @@ class ThemeService
 
     public function getAllThemes(): array
     {
+        $this->ensureThemesGenerated();
+
         return $this->themes;
     }
 
@@ -136,12 +150,16 @@ class ThemeService
 
     public function getActiveThemeConfig(): array
     {
+        $this->ensureThemesGenerated();
+
         $id = $this->getActiveThemeId();
         return $this->themes[$id] ?? $this->themes['theme_1'];
     }
 
     public function setActiveTheme(string $themeId): void
     {
+        $this->ensureThemesGenerated();
+
         if (isset($this->themes[$themeId])) {
             DB::table('settings')->updateOrInsert(
                 ['key' => 'active_theme'],
