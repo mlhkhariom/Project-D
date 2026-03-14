@@ -1,3 +1,7 @@
 ## 2026-02-26 - [Global View Composer Performance Trap]
 **Learning:** Services injected via `View::composer('*')` execute for *every* partial view rendered (including components and includes). Without memoization, this causes severe N+1 query issues (e.g., 12 queries instead of 2 for a simple page). `Schema::hasTable` in SQLite queries `sqlite_master` and is not automatically cached by Laravel.
 **Action:** Always audit global view composers for database calls and ensure strict memoization (property caching) in the service layer. Use `DB::enableQueryLog()` in feature tests to assert query counts.
+
+## 2024-03-14 - Lazy-loading Procedural Theme Generation in ThemeService
+**Learning:** The `ThemeService` singleton, configured in `ThemeServiceProvider` for injection across all views (via `View::composer('*')`), generated all its procedural themes within its constructor. Although the active theme's ID resolution itself was correctly cached and optimized against repeated database queries, the overhead of looping and allocating massive palette arrays per the constructor effectively triggered unneeded computations per request, as long as a view hit it (which was practically every web request).
+**Action:** Move expensive procedural generation from singleton constructors (like `ThemeService::__construct()`) to lazy-loaded methods (e.g., `generateProceduralThemes()`). Use a boolean flag `$themesGenerated` and only generate on demand if a method accesses the full palette or requires config resolution.
