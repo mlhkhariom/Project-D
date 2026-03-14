@@ -44,14 +44,23 @@ class ThemeService
      */
     protected ?bool $hasSettingsTable = null;
 
+    /**
+     * Flag to check if procedural themes are generated.
+     */
+    protected bool $themesGenerated = false;
+
     public function __construct()
     {
-        // Generate the rest of the 20 themes procedurally
-        $this->generateProceduralThemes();
+        // Procedural themes are now lazy-loaded to prevent overhead
+        // when injected globally via View Composers.
     }
 
-    protected function generateProceduralThemes()
+    protected function generateProceduralThemes(): void
     {
+        if ($this->themesGenerated) {
+            return;
+        }
+
         $palettes = [
             'Nature' => ['#16a34a', '#dcfce7', '#f0fdf4', '#14532d'],
             'Ocean' => ['#0ea5e9', '#e0f2fe', '#f0f9ff', '#0c4a6e'],
@@ -94,10 +103,13 @@ class ThemeService
             ];
             $i++;
         }
+
+        $this->themesGenerated = true;
     }
 
     public function getAllThemes(): array
     {
+        $this->generateProceduralThemes();
         return $this->themes;
     }
 
@@ -136,12 +148,14 @@ class ThemeService
 
     public function getActiveThemeConfig(): array
     {
+        $this->generateProceduralThemes();
         $id = $this->getActiveThemeId();
         return $this->themes[$id] ?? $this->themes['theme_1'];
     }
 
     public function setActiveTheme(string $themeId): void
     {
+        $this->generateProceduralThemes();
         if (isset($this->themes[$themeId])) {
             DB::table('settings')->updateOrInsert(
                 ['key' => 'active_theme'],
