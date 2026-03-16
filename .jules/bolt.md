@@ -1,3 +1,7 @@
-## 2026-02-26 - [Global View Composer Performance Trap]
-**Learning:** Services injected via `View::composer('*')` execute for *every* partial view rendered (including components and includes). Without memoization, this causes severe N+1 query issues (e.g., 12 queries instead of 2 for a simple page). `Schema::hasTable` in SQLite queries `sqlite_master` and is not automatically cached by Laravel.
-**Action:** Always audit global view composers for database calls and ensure strict memoization (property caching) in the service layer. Use `DB::enableQueryLog()` in feature tests to assert query counts.
+## 2024-03-16 - [Lazy Loading Theme Construction]
+**Learning:** Procedural generation of data (like themes) inside the constructor of a globally resolved singleton injected via `View::composer('*')` introduces overhead on every request rendering a view. This affects all endpoints since it runs even if only `theme_1` or `theme_2` is used, causing an unnecessary O(N) generation loop where N is the number of themes.
+**Action:** When a service initializes static, expensive configurations (especially in a `View::composer('*')`), defer the computational heavy lifting to an `ensureGenerated()` or lazy-loading method that runs only when the specific data subset (like an uncommon theme or the full list) is explicitly requested.
+
+## 2024-03-16 - [Lazy Loading Theme Construction]
+**Learning:** Procedural generation of data (like themes) inside the constructor of a globally resolved singleton injected via `View::composer('*')` introduces overhead on every request rendering a view. This affects all endpoints since it runs even if only `theme_1` or `theme_2` is used, causing an unnecessary O(N) generation loop where N is the number of themes.
+**Action:** When a service initializes static, expensive configurations (especially in a `View::composer('*')`), defer the computational heavy lifting to an `ensureGenerated()` or lazy-loading method that runs only when the specific data subset (like an uncommon theme or the full list) is explicitly requested.
