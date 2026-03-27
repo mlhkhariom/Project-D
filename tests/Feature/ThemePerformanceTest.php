@@ -76,7 +76,7 @@ class ThemePerformanceTest extends TestCase
 
         // Assert new value is retrieved correctly (and cached again)
         // We use a new instance to ensure we aren't just hitting the local class property cache
-        $newThemeService = new \App\Services\ThemeService();
+        $newThemeService = new \App\Services\ThemeService;
         $newTheme = $newThemeService->getActiveThemeId();
 
         $this->assertEquals('theme_2', $newTheme);
