@@ -1,3 +1,6 @@
 ## 2026-02-26 - [Global View Composer Performance Trap]
 **Learning:** Services injected via `View::composer('*')` execute for *every* partial view rendered (including components and includes). Without memoization, this causes severe N+1 query issues (e.g., 12 queries instead of 2 for a simple page). `Schema::hasTable` in SQLite queries `sqlite_master` and is not automatically cached by Laravel.
 **Action:** Always audit global view composers for database calls and ensure strict memoization (property caching) in the service layer. Use `DB::enableQueryLog()` in feature tests to assert query counts.
+## 2026-04-07 - [Procedural Generation in Constructors]
+**Learning:** `ThemeService` was using procedural loops, string formatting, and `array_rand()` in its constructor to generate 18 theme variants. Because it is globally injected via `View::composer('*')`, this overhead ran synchronously on the first view render of *every* request. Additionally, the `array_rand()` caused theme fonts to change randomly across requests.
+**Action:** Always prefer hardcoded, static data structures over procedural generation in the constructors of globally injected services. I converted the procedural logic to a static array, eliminating the instantiation overhead entirely and fixing the non-deterministic font issue.
