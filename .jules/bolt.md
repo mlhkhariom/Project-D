@@ -1,3 +1,6 @@
 ## 2026-02-26 - [Global View Composer Performance Trap]
 **Learning:** Services injected via `View::composer('*')` execute for *every* partial view rendered (including components and includes). Without memoization, this causes severe N+1 query issues (e.g., 12 queries instead of 2 for a simple page). `Schema::hasTable` in SQLite queries `sqlite_master` and is not automatically cached by Laravel.
 **Action:** Always audit global view composers for database calls and ensure strict memoization (property caching) in the service layer. Use `DB::enableQueryLog()` in feature tests to assert query counts.
+## 2026-02-26 - [Avoid Procedural Generation in Singleton Services]
+**Learning:** Procedural generation of deterministic data in global view composer services like `ThemeService` runs on every request for each view render (or at least upon the first view render when the singleton is instantiated). This creates non-trivial and unnecessary instantiation overhead, and `array_rand` operations make fonts non-deterministic unless properly seeded or hardcoded.
+**Action:** Always prefer statically hardcoding configuration data arrays instead of generating them procedurally inside the constructor of injected/singleton services.
