@@ -1,3 +1,6 @@
 ## 2026-02-26 - [Global View Composer Performance Trap]
 **Learning:** Services injected via `View::composer('*')` execute for *every* partial view rendered (including components and includes). Without memoization, this causes severe N+1 query issues (e.g., 12 queries instead of 2 for a simple page). `Schema::hasTable` in SQLite queries `sqlite_master` and is not automatically cached by Laravel.
 **Action:** Always audit global view composers for database calls and ensure strict memoization (property caching) in the service layer. Use `DB::enableQueryLog()` in feature tests to assert query counts.
+## 2026-05-05 - [Procedural Theme Initialization Overhead]
+**Learning:** Procedurally generating deterministic data (like a 20-theme array) in the constructor of a globally injected singleton (`ThemeService`) causes performance bottlenecks. Even when cached, instantiating the class triggers the loop. Converting this to a hardcoded static array allows PHP OPcache to store the array in shared memory, achieving zero-overhead instantiation and eliminating non-deterministic issues like random font selection across page loads.
+**Action:** Replace procedurally generated static properties with hardcoded static arrays, especially in globally injected singleton constructors.
