@@ -2,9 +2,9 @@
 
 namespace App\Providers;
 
-use Illuminate\Support\ServiceProvider;
-use Illuminate\Support\Facades\View;
 use App\Services\ThemeService;
+use Illuminate\Support\Facades\View;
+use Illuminate\Support\ServiceProvider;
 
 class ThemeServiceProvider extends ServiceProvider
 {
@@ -14,7 +14,7 @@ class ThemeServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->singleton(ThemeService::class, function ($app) {
-            return new ThemeService();
+            return new ThemeService;
         });
     }
 
