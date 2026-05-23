@@ -1,3 +1,6 @@
 ## 2026-02-26 - [Global View Composer Performance Trap]
 **Learning:** Services injected via `View::composer('*')` execute for *every* partial view rendered (including components and includes). Without memoization, this causes severe N+1 query issues (e.g., 12 queries instead of 2 for a simple page). `Schema::hasTable` in SQLite queries `sqlite_master` and is not automatically cached by Laravel.
 **Action:** Always audit global view composers for database calls and ensure strict memoization (property caching) in the service layer. Use `DB::enableQueryLog()` in feature tests to assert query counts.
+## 2026-02-26 - [View Composer Constructor Cost]
+**Learning:** Constructors of globally injected singletons (like `ThemeService` injected via `View::composer('*')`) run once per request when the first view renders. Procedural generation of large static arrays (e.g. 20 themes with colors and fonts) inside the constructor creates measurable CPU overhead and makes properties non-deterministic (e.g. `array_rand` causes fonts to change randomly). PHP OPcache cannot cache procedurally generated arrays.
+**Action:** Always replace procedural static data generation in globally injected services with hardcoded PHP arrays so OPcache can store them in shared memory. This eliminates zero-overhead instantiation.
