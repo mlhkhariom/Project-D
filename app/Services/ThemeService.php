@@ -12,10 +12,10 @@ class ThemeService
         'theme_1' => [
             'name' => 'Default (Clean)',
             'colors' => [
-                'primary' => '#3b82f6', // blue-500
-                'secondary' => '#64748b', // slate-500
-                'bg' => '#f3f4f6', // gray-100
-                'text' => '#1f2937', // gray-800
+                'primary' => '#3b82f6',
+                'secondary' => '#64748b',
+                'bg' => '#f3f4f6',
+                'text' => '#1f2937',
             ],
             'font' => 'Figtree',
             'layout' => 'standard',
@@ -23,15 +23,212 @@ class ThemeService
         'theme_2' => [
             'name' => 'Midnight (Dark)',
             'colors' => [
-                'primary' => '#6366f1', // indigo-500
-                'secondary' => '#94a3b8', // slate-400
-                'bg' => '#0f172a', // slate-900
-                'text' => '#f8fafc', // slate-50
+                'primary' => '#6366f1',
+                'secondary' => '#94a3b8',
+                'bg' => '#0f172a',
+                'text' => '#f8fafc',
             ],
             'font' => 'Inter',
             'layout' => 'standard',
         ],
-        // I will generate 18 more procedural variants
+        'theme_3' => [
+            'name' => 'Nature Light',
+            'colors' => [
+                'primary' => '#16a34a',
+                'secondary' => '#dcfce7',
+                'bg' => '#ffffff',
+                'text' => '#111827',
+            ],
+            'font' => 'Figtree',
+            'layout' => 'boxed',
+        ],
+        'theme_4' => [
+            'name' => 'Nature Dark',
+            'colors' => [
+                'primary' => '#16a34a',
+                'secondary' => '#14532d',
+                'bg' => '#14532d',
+                'text' => '#f9fafb',
+            ],
+            'font' => 'Roboto',
+            'layout' => 'wide',
+        ],
+        'theme_5' => [
+            'name' => 'Ocean Light',
+            'colors' => [
+                'primary' => '#0ea5e9',
+                'secondary' => '#e0f2fe',
+                'bg' => '#ffffff',
+                'text' => '#111827',
+            ],
+            'font' => 'Open Sans',
+            'layout' => 'boxed',
+        ],
+        'theme_6' => [
+            'name' => 'Ocean Dark',
+            'colors' => [
+                'primary' => '#0ea5e9',
+                'secondary' => '#0c4a6e',
+                'bg' => '#0c4a6e',
+                'text' => '#f9fafb',
+            ],
+            'font' => 'Lato',
+            'layout' => 'wide',
+        ],
+        'theme_7' => [
+            'name' => 'Sunset Light',
+            'colors' => [
+                'primary' => '#f97316',
+                'secondary' => '#ffedd5',
+                'bg' => '#ffffff',
+                'text' => '#111827',
+            ],
+            'font' => 'Montserrat',
+            'layout' => 'boxed',
+        ],
+        'theme_8' => [
+            'name' => 'Sunset Dark',
+            'colors' => [
+                'primary' => '#f97316',
+                'secondary' => '#7c2d12',
+                'bg' => '#7c2d12',
+                'text' => '#f9fafb',
+            ],
+            'font' => 'Figtree',
+            'layout' => 'wide',
+        ],
+        'theme_9' => [
+            'name' => 'Berry Light',
+            'colors' => [
+                'primary' => '#db2777',
+                'secondary' => '#fce7f3',
+                'bg' => '#ffffff',
+                'text' => '#111827',
+            ],
+            'font' => 'Roboto',
+            'layout' => 'boxed',
+        ],
+        'theme_10' => [
+            'name' => 'Berry Dark',
+            'colors' => [
+                'primary' => '#db2777',
+                'secondary' => '#831843',
+                'bg' => '#831843',
+                'text' => '#f9fafb',
+            ],
+            'font' => 'Open Sans',
+            'layout' => 'wide',
+        ],
+        'theme_11' => [
+            'name' => 'Royal Light',
+            'colors' => [
+                'primary' => '#7c3aed',
+                'secondary' => '#ede9fe',
+                'bg' => '#ffffff',
+                'text' => '#111827',
+            ],
+            'font' => 'Lato',
+            'layout' => 'boxed',
+        ],
+        'theme_12' => [
+            'name' => 'Royal Dark',
+            'colors' => [
+                'primary' => '#7c3aed',
+                'secondary' => '#4c1d95',
+                'bg' => '#4c1d95',
+                'text' => '#f9fafb',
+            ],
+            'font' => 'Montserrat',
+            'layout' => 'wide',
+        ],
+        'theme_13' => [
+            'name' => 'Gold Light',
+            'colors' => [
+                'primary' => '#eab308',
+                'secondary' => '#fef9c3',
+                'bg' => '#ffffff',
+                'text' => '#111827',
+            ],
+            'font' => 'Figtree',
+            'layout' => 'boxed',
+        ],
+        'theme_14' => [
+            'name' => 'Gold Dark',
+            'colors' => [
+                'primary' => '#eab308',
+                'secondary' => '#713f12',
+                'bg' => '#713f12',
+                'text' => '#f9fafb',
+            ],
+            'font' => 'Roboto',
+            'layout' => 'wide',
+        ],
+        'theme_15' => [
+            'name' => 'Cyber Light',
+            'colors' => [
+                'primary' => '#22d3ee',
+                'secondary' => '#1e293b',
+                'bg' => '#ffffff',
+                'text' => '#111827',
+            ],
+            'font' => 'Open Sans',
+            'layout' => 'boxed',
+        ],
+        'theme_16' => [
+            'name' => 'Cyber Dark',
+            'colors' => [
+                'primary' => '#22d3ee',
+                'secondary' => '#e2e8f0',
+                'bg' => '#e2e8f0',
+                'text' => '#f9fafb',
+            ],
+            'font' => 'Lato',
+            'layout' => 'wide',
+        ],
+        'theme_17' => [
+            'name' => 'Luxury Light',
+            'colors' => [
+                'primary' => '#1c1917',
+                'secondary' => '#e7e5e4',
+                'bg' => '#ffffff',
+                'text' => '#111827',
+            ],
+            'font' => 'Montserrat',
+            'layout' => 'boxed',
+        ],
+        'theme_18' => [
+            'name' => 'Luxury Dark',
+            'colors' => [
+                'primary' => '#1c1917',
+                'secondary' => '#44403c',
+                'bg' => '#44403c',
+                'text' => '#f9fafb',
+            ],
+            'font' => 'Figtree',
+            'layout' => 'wide',
+        ],
+        'theme_19' => [
+            'name' => 'Mint Light',
+            'colors' => [
+                'primary' => '#14b8a6',
+                'secondary' => '#ccfbf1',
+                'bg' => '#ffffff',
+                'text' => '#111827',
+            ],
+            'font' => 'Roboto',
+            'layout' => 'boxed',
+        ],
+        'theme_20' => [
+            'name' => 'Mint Dark',
+            'colors' => [
+                'primary' => '#14b8a6',
+                'secondary' => '#134e4a',
+                'bg' => '#134e4a',
+                'text' => '#f9fafb',
+            ],
+            'font' => 'Open Sans',
+            'layout' => 'wide',
+        ],
     ];
 
     /**
@@ -46,54 +243,9 @@ class ThemeService
 
     public function __construct()
     {
-        // Generate the rest of the 20 themes procedurally
-        $this->generateProceduralThemes();
-    }
-
-    protected function generateProceduralThemes()
-    {
-        $palettes = [
-            'Nature' => ['#16a34a', '#dcfce7', '#f0fdf4', '#14532d'],
-            'Ocean' => ['#0ea5e9', '#e0f2fe', '#f0f9ff', '#0c4a6e'],
-            'Sunset' => ['#f97316', '#ffedd5', '#fff7ed', '#7c2d12'],
-            'Berry' => ['#db2777', '#fce7f3', '#fdf2f8', '#831843'],
-            'Royal' => ['#7c3aed', '#ede9fe', '#f5f3ff', '#4c1d95'],
-            'Gold' => ['#eab308', '#fef9c3', '#fefce8', '#713f12'],
-            'Cyber' => ['#22d3ee', '#1e293b', '#0f172a', '#e2e8f0'],
-            'Luxury' => ['#1c1917', '#e7e5e4', '#fafaf9', '#44403c'],
-            'Mint' => ['#14b8a6', '#ccfbf1', '#f0fdfa', '#134e4a'],
-        ];
-
-        $fonts = ['Figtree', 'Roboto', 'Open Sans', 'Lato', 'Montserrat'];
-
-        $i = 3;
-        foreach ($palettes as $name => $colors) {
-             $this->themes["theme_{$i}"] = [
-                'name' => "$name Light",
-                'colors' => [
-                    'primary' => $colors[0],
-                    'secondary' => $colors[1],
-                    'bg' => '#ffffff',
-                    'text' => '#111827',
-                ],
-                'font' => $fonts[array_rand($fonts)],
-                'layout' => 'boxed',
-            ];
-            $i++;
-
-            $this->themes["theme_{$i}"] = [
-                'name' => "$name Dark",
-                'colors' => [
-                    'primary' => $colors[0],
-                    'secondary' => $colors[3],
-                    'bg' => $colors[3], // Dark bg
-                    'text' => '#f9fafb',
-                ],
-                'font' => $fonts[array_rand($fonts)],
-                'layout' => 'wide',
-            ];
-            $i++;
-        }
+        // Procedural generation was replaced with a hardcoded static array
+        // to eliminate O(N) array allocation overhead during instantiation
+        // since this class is a singleton injected globally via View::composer('*').
     }
 
     public function getAllThemes(): array
@@ -112,6 +264,7 @@ class ThemeService
         $cachedId = Cache::get('active_theme_id');
         if ($cachedId !== null) {
             $this->cachedActiveThemeId = $cachedId;
+
             return $this->cachedActiveThemeId;
         }
 
@@ -121,7 +274,7 @@ class ThemeService
         }
 
         // Avoid database calls during migrations or if table doesn't exist
-        if (!$this->hasSettingsTable) {
+        if (! $this->hasSettingsTable) {
             return 'theme_1';
         }
 
@@ -137,6 +290,7 @@ class ThemeService
     public function getActiveThemeConfig(): array
     {
         $id = $this->getActiveThemeId();
+
         return $this->themes[$id] ?? $this->themes['theme_1'];
     }
 
