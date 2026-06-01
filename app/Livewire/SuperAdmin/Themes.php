@@ -2,12 +2,13 @@
 
 namespace App\Livewire\SuperAdmin;
 
-use Livewire\Component;
 use App\Services\ThemeService;
+use Livewire\Component;
 
 class Themes extends Component
 {
     public $activeThemeId;
+
     public $themes = [];
 
     public function mount(ThemeService $themeService)
